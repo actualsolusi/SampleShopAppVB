@@ -10,14 +10,16 @@ Public Class BookDAL
 
     Public Function GetAll() As IEnumerable(Of Book)
         Using conn As New SqlConnection(GetConnStr())
-            Dim strSql = "select * from Books left join Categories " &
-                "on Books.CategoryID = Categories.CategoryID " &
-                "order by Books.Title"
+            Dim strSql = "select * from Books left join Categories 
+                          on Books.CategoryID = Categories.CategoryID 
+                          left join Authors on Books.AuthorID=Authors.AuthorID
+                          order by Books.Title"
 
-            Dim results = conn.Query(Of Book, Category, Book)(strSql, Function(b, c)
-                                                                          b.Category = c
-                                                                          Return b
-                                                                      End Function, splitOn:="CategoryID")
+            Dim results = conn.Query(Of Book, Category, Author, Book)(strSql, Function(b, c, a)
+                                                                                  b.Category = c
+                                                                                  b.Author = a
+                                                                                  Return b
+                                                                              End Function, splitOn:="CategoryID,AuthorID")
             Return results
         End Using
     End Function
